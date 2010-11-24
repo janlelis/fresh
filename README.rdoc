@@ -1,6 +1,6 @@
 = Fresh Ruby Enhanced SHell
 
-We love Ruby. We love the command line. So... the shell needs to be rubyfied ;).
+We love Ruby. And we love the command line. So... the shell needs to be rubyfied ;).
 
 == How does it work?
 
@@ -21,6 +21,8 @@ Start it with:
 (or just <tt>fresh</tt>)
 
 == Usage & configuration options
+
+For an example session, see {this blog entry}[http://rbjl.net/43-use-fresh-ruby-as-your-shell].
 
 The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^[a-z_-]+\s+.*/i</tt> (match a single word followed by at least one space). It can be adjusted in <tt>Ripl.config[:fresh_system_regexp]</tt>.
 
@@ -68,6 +70,11 @@ There are lots of things which can get better:
 * Fresh ideas
 
 Feel free to fork in your improvements ;)
+
+== Other gems you might find interesting
+
+* {rush}[https://github.com/adamwiggins/rush] - Another Ruby shell, different concept
+* {ripl}[https://github.com/cldwalker/ripl] - An irb alternative, +fresh+ is based on it
 
 == Copyright
 
