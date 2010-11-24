@@ -1,0 +1,76 @@
+= Fresh Ruby Enhanced SHell
+
+We love Ruby. We love the command line. So... the shell needs to be rubyfied ;).
+
+== How does it work?
+
+Basically, fresh is a Ruby console like irb: Enter a Ruby expression and it gets evaluated. But not everything is interpreted as Ruby: The input is thrown against a regular expression to determine if it is meant to be a Ruby or a system command.
+
+May sound like voodoo, but works surprisingly well in practice ;).
+
+== Get fresh
+
+Install the gem with:
+
+  gem install ripl-fresh
+
+Start it with:
+
+  ripl fresh
+
+(or just <tt>fresh</tt>)
+
+== Usage & configuration options
+
+The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^[a-z_-]+\s+.*/i</tt> (match a single word followed by at least one space). It can be adjusted in <tt>Ripl.config[:fresh_system_regexp]</tt>.
+
+Of course, there are also exceptions that should still get interpreted as Ruby (e.g. <tt>def </tt>). These can be found and modified in the <tt>Ripl.config[:fresh_ruby_words]</tt> array.
+
+Single words get interpreted as Ruby by default. You can set your "single system words" in <tt>Ripl.config[:fresh_system_words]</tt> (e.g. <tt>ls</tt>).
+
+There is also a third kind of command mode (besides <tt>:ruby</tt> and <tt>:system</tt>): <tt>:mixed</tt>. They look and feel like system commands, but redirect to the Ruby method described by the first word. You can register them in <tt> Ripl.config[:fresh_mixed_words]</tt> (e.g. +cd+).
+
+Of course, there is a way to explicitly set your command mode: You can prefix your input with a space to force Ruby mode as well as you can prefix it with <tt>^</tt> to force system mode. The strings used for this can be customized in <tt>Ripl.config[:fresh_system_prefix]</tt> and <tt>Ripl.config[:fresh_ruby_prefix]</tt>.
+
+You need to take a look at <tt>get_input</tt> method in the source file to 100% understand the command mode detection way.
+
+=== Defaults
+
+  # prefixes
+  Ripl.config[:fresh_system_prefix] = %w[^]
+  Ripl.config[:fresh_ruby_prefix]   = [' ']
+  # single words
+  Ripl.config[:fresh_system_words]  = %w[top ls] 
+  Ripl.config[:fresh_ruby_words]    = %w[begin case class def for if module undef unless until while puts warn print p pp ap raise fail loop require load lambda proc system]
+  # catch mix words
+  Ripl.config[:fresh_mixed_words]   = %w[cd] 
+  # main regexp
+  Ripl.config[:fresh_system_regexp] = /^([a-z_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=))/i
+
+== Customization
+
+Besides customizing your fresh with the configuration options, you can further enhance it with Ruby plugins, because it's based on {ripl}[https://github.com/cldwalker/ripl]. Just install the <tt>ripl-plugin_name</tt> and add it to your <tt>.riplrc</tt> file:
+
+  require 'ripl/plugin_name'
+
+Currently, most {plugins}[http://github.com/cldwalker/ripl-color_error] {enable}[http://github.com/janlelis/ripl-color_result] {colors}[http://github.com/janlelis/ripl-color_streams] and {IRB}[http://github.com/janlelis/ripl-multi_line] -{like}[http://github.com/cldwalker/ripl-commands] {features}[http://github.com/cldwalker/ripl-irb].
+
+== TODO
+
+There are lots of things which can get better:
+
+* Improve auto-completion
+* More cool (and colorful?) <tt>:mixed</tt> Ruby commands
+* Improve interaction between system and ruby commands
+  * <tt>ripl-multi_line</tt> for system commands
+  * Result of system commands should be available for ruby, not only printed to stdout
+* Improve default configuration
+* Fresh ideas
+
+Feel free to fork in your improvements ;)
+
+== Copyright
+
+Copyright (c) 2010 Jan Lelis <http://code-needs-smileys.com> released under the MIT license.
+
+J-_-L
