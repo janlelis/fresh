@@ -49,13 +49,15 @@ module Ripl
           input = input[$1.size..-1]
           :ruby
         # single words, and main regex to match shell commands
-        when /^(\w+)$/i, Ripl.config[:fresh_match_regexp]
+        when /^([a-z_-]+)$/i, Ripl.config[:fresh_match_regexp]
           if Ripl.config[:fresh_ruby_words].include?($1)
             :ruby
           elsif Ripl.config[:fresh_mixed_words].include?($1)
             :mixed
           elsif Ripl.config[:fresh_system_words].include?($1)
             :system
+          elsif Kernel.respond_to? $1.to_sym
+            :ruby
           else
             Ripl.config[:fresh_match_default]
           end
@@ -130,20 +132,19 @@ require File.dirname(__FILE__) + '/fresh/commands'
 # prefixes
 Ripl.config[:fresh_system_prefix]  = %w[^]
 Ripl.config[:fresh_ruby_prefix]    = [' ']
-# single words
+# word arrays
 Ripl.config[:fresh_ruby_words]     = %w[begin case class def for if module undef unless until while puts warn print p pp ap raise fail loop require load lambda proc system]
 Ripl.config[:fresh_system_words]   =
   ENV['PATH'].split(File::PATH_SEPARATOR).uniq.map {|e|
     File.directory?(e) ? Dir.entries(e) : []
   }.flatten.uniq - ['.', '..'] 
-# catch mix words
 Ripl.config[:fresh_mixed_words]    = %w[cd] 
 # main regexp
-Ripl.config[:fresh_match_regexp]    = /^([a-z_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=))/i
+Ripl.config[:fresh_match_regexp]    = /^([a-z\/_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=))/i
 # regex matched but word not in one of the three arrays, possible values: :ruby, :system, :mixed
-Ripl.config[:fresh_match_default]   = :ruby 
+Ripl.config[:fresh_match_default]   = :ruby
 # regex did not match
-Ripl.config[:fresh_default]         = :ruby 
+Ripl.config[:fresh_default]         = :ruby
 # configure directory prompt
 Ripl.config[:prompt] = proc{
   path = FileUtils.pwd

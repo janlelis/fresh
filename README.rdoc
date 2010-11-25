@@ -30,11 +30,13 @@ For an example session, see {this blog entry}[http://rbjl.net/43-use-fresh-ruby-
 
 The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^[a-z_-]+\s+.*/i</tt> (match a single word followed by at least one space). It can be adjusted in <tt>Ripl.config[:fresh_match_regexp]</tt>.
 
-If this regexp matches or the input is a single word <tt>([a-z_-]+)</tt>, _fresh_ searches through the <tt>Ripl.config[:fresh_ruby_words]</tt> array for exception that still should get interpreted as Ruby (e.g. <tt>def </tt>).
+If this regexp matches or the input is a single word <tt>([a-z_-]+)</tt>, _fresh_ searches through the <tt>Ripl.config[:fresh_ruby_words]</tt> array for exceptions that still should get interpreted as Ruby (e.g. <tt>def </tt>).
 
 Then, the <tt>Ripl.config[:fresh_system_words]</tt> arrays is checked, if it contains the command. This array defaults to your <tt>ENV['PATH']</tt>. You can add your own system commands there.
 
 There is also a third kind of command mode (besides <tt>:ruby</tt> and <tt>:system</tt>): <tt>:mixed</tt>. They look and feel like system commands, but redirect to the Ruby method described by the first word. You can register them in <tt> Ripl.config[:fresh_mixed_words]</tt> (e.g. +cd+).
+
+As a fallback, _fresh_ checks <tt>Kernel.respond_to?</tt>, if there is a ruby method with that name.
 
 If the regexp does match, but the command could not be found in any of the three word arrays, the command mode will be set to <tt>Ripl.config[:fresh_match_default]</tt> (<tt>:ruby</tt>). If the regexp does not match, <tt>Ripl.config[:fresh_default]</tt> is used (also defaults to <tt>:ruby</tt>).
 
