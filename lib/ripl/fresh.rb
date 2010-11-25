@@ -3,7 +3,7 @@ require 'fileutils'
 
 module Ripl
   module Fresh
-    VERSION = '0.1.0'
+    VERSION = '0.1.1'
 
     class << self
       # helper to parse options
@@ -31,8 +31,6 @@ module Ripl
         # register bond completion
         Ripl.config[:completion][:gems] ||= []
         Ripl.config[:completion][:gems] << 'ripl-fresh'
-        # load :mixed commands
-        require File.dirname(__FILE__) + '/fresh/commands'
       end
 
       # determine @command_mode
@@ -50,30 +48,20 @@ module Ripl
         when Ripl::Fresh.option_array_to_regexp( Ripl.config[:fresh_ruby_prefix] )
           input = input[$1.size..-1]
           :ruby
-        # single words
-        when /^\w+$/i
-          if Ripl.config[:fresh_ruby_words].include?($&)
+        # single words, and main regex to match shell commands
+        when /^(\w+)$/i, Ripl.config[:fresh_match_regexp]
+          if Ripl.config[:fresh_ruby_words].include?($1)
             :ruby
-          elsif Ripl.config[:fresh_mixed_words].include?($&)
+          elsif Ripl.config[:fresh_mixed_words].include?($1)
             :mixed
-          elsif Ripl.config[:fresh_system_words].include?($&)
+          elsif Ripl.config[:fresh_system_words].include?($1)
             :system
           else
-            :ruby
-          end
-        # set of commands that call the ruby method but have command line style calling (args without "")
-        when Ripl::Fresh.option_array_to_regexp( Ripl.config[:fresh_mixed_words] )
-          :mixed
-        # here is the important magical regex for shell commands
-        when Ripl.config[:fresh_system_regexp]
-          if Ripl.config[:fresh_ruby_words].include? $1
-            :ruby
-          else
-            :system
+            Ripl.config[:fresh_match_default]
           end
         # default is still ruby ;)
         else
-          :ruby
+          Ripl.config[:fresh_default]
         end
 
         input
@@ -134,18 +122,28 @@ Ripl.config[:readline] = false
 require 'ripl/readline'
 Ripl::Shell.send :include, Ripl::Fresh::Shell
 
+# load :mixed commands
+require File.dirname(__FILE__) + '/fresh/commands'
+
 ## fresh config ###
 
 # prefixes
 Ripl.config[:fresh_system_prefix]  = %w[^]
 Ripl.config[:fresh_ruby_prefix]    = [' ']
 # single words
-Ripl.config[:fresh_system_words]  = %w[top ls] 
-Ripl.config[:fresh_ruby_words]    = %w[begin case class def for if module undef unless until while puts warn print p pp ap raise fail loop require load lambda proc system]
+Ripl.config[:fresh_ruby_words]     = %w[begin case class def for if module undef unless until while puts warn print p pp ap raise fail loop require load lambda proc system]
+Ripl.config[:fresh_system_words]   =
+  ENV['PATH'].split(File::PATH_SEPARATOR).uniq.map {|e|
+    File.directory?(e) ? Dir.entries(e) : []
+  }.flatten.uniq - ['.', '..'] 
 # catch mix words
-Ripl.config[:fresh_mixed_words]   = %w[cd] 
+Ripl.config[:fresh_mixed_words]    = %w[cd] 
 # main regexp
-Ripl.config[:fresh_system_regexp]  = /^([a-z_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=))/i
+Ripl.config[:fresh_match_regexp]    = /^([a-z_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=))/i
+# regex matched but word not in one of the three arrays, possible values: :ruby, :system, :mixed
+Ripl.config[:fresh_match_default]   = :ruby 
+# regex did not match
+Ripl.config[:fresh_default]         = :ruby 
 # configure directory prompt
 Ripl.config[:prompt] = proc{
   path = FileUtils.pwd
