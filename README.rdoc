@@ -44,18 +44,34 @@ Of course, there is a way to explicitly set your command mode: You can prefix yo
 
 You need to take a look at <tt>get_input</tt> method in the source file to 100% understand the command mode detection way.
 
+=== Prompt
+There is <tt>Riplc.config[:fresh_prompt]</tt> option, which takes a wide range of possible values. You can pass in a proc or a direct string. Furthermore, you can pass a symbol to get one of the following:
+* <tt>:default</tt> - usual fresh (directory) prompt
+* <tt>:PS1</tt> - use PS1 environment variable
+* <tt>:ripl</tt> - don't change prompt
+* <tt>:irb</tt> - use irbs :PROMPT_I (if set)
+* <tt>:simple</tt> - ">> "
+
 === Defaults
 
   # prefixes
-  Ripl.config[:fresh_system_prefix] = %w[^]
-  Ripl.config[:fresh_ruby_prefix]   = [' ']
-  # single words
-  Ripl.config[:fresh_system_words]  = %w[top ls] 
-  Ripl.config[:fresh_ruby_words]    = %w[begin case class def for if module undef unless until while puts warn print p pp ap raise fail loop require load lambda proc system]
-  # catch mix words
-  Ripl.config[:fresh_mixed_words]   = %w[cd] 
+  Ripl.config[:fresh_system_prefix]  = %w[^]
+  Ripl.config[:fresh_ruby_prefix]    = [' ']
+  # word arrays
+  Ripl.config[:fresh_ruby_words]     = %w[begin case class def for if module undef unless until while puts warn print p pp ap raise fail loop require load lambda proc system]
+  Ripl.config[:fresh_system_words]   =
+    ENV['PATH'].split(File::PATH_SEPARATOR).uniq.map {|e|
+      File.directory?(e) ? Dir.entries(e) : []
+    }.flatten.uniq - ['.', '..'] 
+  Ripl.config[:fresh_mixed_words]    = %w[cd] 
   # main regexp
-  Ripl.config[:fresh_system_regexp] = /^([a-z_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=))/i
+  Ripl.config[:fresh_match_regexp]    = /^([a-z\/_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=))/i
+  # regex matched but word not in one of the three arrays, possible values: :ruby, :system, :mixed
+  Ripl.config[:fresh_match_default]   = :ruby
+  # regex did not match
+  Ripl.config[:fresh_default]         = :ruby
+  # configure prompt
+  Ripl.config[:fresh_prompt] = :default
 
 == Customization
 
@@ -71,10 +87,12 @@ There are lots of things which can get better:
 
 * Improve auto-completion
 * More cool (and colorful?) <tt>:mixed</tt> Ruby commands
-* Improve interaction between system and ruby commands
+* Improve interaction between system and Ruby commands
   * <tt>ripl-multi_line</tt> for system commands
   * Result of system commands should be available for ruby, not only printed to stdout
+* Respect "..." (single argument) for :mixed commands
 * Improve default configuration
+* Add tests
 * Fresh ideas
 
 Feel free to fork in your improvements ;)

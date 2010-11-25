@@ -146,41 +146,8 @@ Ripl.config[:fresh_match_regexp]    = /^([a-z\/_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=
 Ripl.config[:fresh_match_default]   = :ruby
 # regex did not match
 Ripl.config[:fresh_default]         = :ruby
-# configure directory prompt
-Ripl.config[:prompt] = proc{
-  # If the $PS1 environment variable is set, attempt to respect it
-  if ENV['PS1']
-    prompt = ENV['PS1'].dup
-    prompt.gsub!('\a', '')                              # unsupported
-    prompt.gsub!('\d', Time.now.strftime("%a %b %d"))
-    prompt.gsub!(/\\D\{([^}]+)\}/){Time.now.strftime($1)}
-    prompt.gsub!('\e', "\033")
-    prompt.gsub!('\h', Socket.gethostname.split('.')[0])
-    prompt.gsub!('\H', Socket.gethostname.chomp)
-    prompt.gsub!('\j', '')                              # unsupported
-    prompt.gsub!('\l', '')                              # unsupported
-    prompt.gsub!('\n', "\n")
-    prompt.gsub!('\r', "\r")
-    prompt.gsub!('\s', 'fresh')
-    prompt.gsub!('\t', Time.now.strftime("%H:%M:%S"))
-    prompt.gsub!('\T', Time.now.strftime("%I:%M:%S"))
-    prompt.gsub!('\@', Time.now.strftime("%I:%M %p"))
-    prompt.gsub!('\A', Time.now.strftime("%H:%M"))
-    prompt.gsub!('\u', Etc.getlogin)
-    prompt.gsub!('\v', `#{`echo $SHELL`.chomp} --version`.gsub(/(.*(\d+\.\d+)\..*)/m){$2})
-    prompt.gsub!('\V', `#{`echo $SHELL`.chomp} --version`.gsub(/(.*(\d+\.\d+\.\d+).*)/m){$2})
-    prompt.gsub!('\w', FileUtils.pwd.gsub(/#{ File.expand_path('~') }/, '~'))
-    prompt.gsub!('\W', File.basename(FileUtils.pwd.gsub(/#{ File.expand_path('~') }/, '~')))
-    prompt.gsub!('\!', '')                              # unsupported
-    prompt.gsub!('\#', '')                              # unsupported
-    prompt.gsub!('\$'){uid = nil; Etc.passwd{|u| uid = u.uid if u.name == Etc.getlogin}; uid == 0 ? '#' : '$'}
-    prompt
-  # Otherwise if $PS1 is not set in the calling shell, use a default prompt syntax
-  else
-    path = FileUtils.pwd
-    path.gsub! /#{ File.expand_path('~') }/, '~'
-    path + '> '
-  end
-}
+# configure prompt
+Ripl.config[:fresh_prompt] = :default
+require File.dirname(__FILE__) + '/fresh/prompt'
 
 # J-_-L
