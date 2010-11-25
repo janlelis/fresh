@@ -1,10 +1,9 @@
 require 'ripl'
 require 'fileutils'
-require 'socket'
 
 module Ripl
   module Fresh
-    VERSION = '0.1.1'
+    VERSION = '0.1.2'
 
     class << self
       # helper to parse options
@@ -148,6 +147,7 @@ Ripl.config[:fresh_match_default]   = :ruby
 Ripl.config[:fresh_default]         = :ruby
 # configure prompt
 Ripl.config[:fresh_prompt] = :default
+
 require File.dirname(__FILE__) + '/fresh/prompt'
 
 # J-_-L

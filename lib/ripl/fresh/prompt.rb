@@ -1,3 +1,6 @@
+require 'socket'
+require 'etc'
+
 # save current prompt
 ripl_prompt = Ripl.config[:prompt] # TODO currently not working
 
@@ -79,3 +82,5 @@ Ripl.config[:prompt] = proc{
     end
   end
 }
+
+# J-_-L
