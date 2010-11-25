@@ -9,7 +9,14 @@ file_completion = proc{ |input|
 
 system_command_completion = proc{ Ripl.config[:fresh_system_words] }
 
-#everything_completion = proc{}
+everything_completion = proc{ # TODO: improve
+  file_completion.call +
+  system_command_completion.call + 
+  Kernel.instance_methods +
+  Object.instance_methods +
+  Object.constants
+}
+
 
 complete :on => Ripl.config[:fresh_match_regexp],
          :search => false,
@@ -20,4 +27,6 @@ complete :on => Ripl::Fresh.option_array_to_regexp( Ripl.config[:fresh_system_pr
 #         :search => false,
           &system_command_completion
 
+complete :on => /^[a-z\/_-]+/i,
+          &everything_completion
 # J-_-L
