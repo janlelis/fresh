@@ -34,44 +34,46 @@ module Ripl
 
       # determine @command_mode
       def get_input
-        input = super
+        command_line = super
 
-        return input  if @buffer # ripl-multi_line TODO allow system commands
+        return command_line  if @buffer # ripl-multi_line TODO allow system commands
 
         # This case statement decides the command mode,
-        #  and which part of the input should be used for what... # TODO refactor
+        #  and which part of the input should be used for what...
+        #  Note: Regexp match groups are used!
         @result_storage = @result_operator = nil
-        @command_mode = case input
-        # force system with a single ^
-        when Ripl::Fresh.option_array_to_regexp( Ripl.config[:fresh_system_prefix] )
-          input = input[$1.size..-1] # TODO refactor, too hacky?
-          :system
+
+        @command_mode = case command_line
         # force ruby with a space
-        when Ripl::Fresh.option_array_to_regexp( Ripl.config[:fresh_ruby_prefix] )
-          input = input[$1.size..-1]
+        when /^ /
           :ruby
-        # single words, and main regex to match shell commands
-        when *Array( Ripl.config[:fresh_match_regexp] )
-          input            = $1
-          @result_operator = $3
-          @result_storage  = $4
-          if Ripl.config[:fresh_ruby_words].include?($2)
-            :ruby
-          elsif Ripl.config[:fresh_mixed_words].include?($2)
-            :mixed
-          elsif Ripl.config[:fresh_system_words].include?($2)
+        # regexp match shell commands
+        when *Array( Ripl.config[:fresh_patterns] )
+          command_line     = $~[:command_line]     if $~.names.include? 'command_line'
+          command          = $~[:command]          if $~.names.include? 'command'
+          @result_operator = $~[:result_operator]  if $~.names.include? 'result_operator'
+          @result_storage  = $~[:result_storage]   if $~.names.include? 'result_storage'
+          forced           = !! $~[:force]         if $~.names.include? 'force'
+
+          if forced
             :system
-          elsif Kernel.respond_to? $2.to_sym
+          elsif Ripl.config[:fresh_ruby_commands].include?( command )
+            :ruby
+          elsif Ripl.config[:fresh_mixed_commands].include?( command )
+            :mixed
+          elsif Ripl.config[:fresh_system_commands].include?( command )
+            :system
+          elsif Kernel.respond_to? command.to_sym
             :ruby
           else
-            Ripl.config[:fresh_match_default]
+            Ripl.config[:fresh_unknown_command_mode]
           end
         # default is still ruby ;)
         else
-          Ripl.config[:fresh_default]
+          Ripl.config[:fresh_default_mode]
         end
 
-        input
+        command_line
       end
 
       # get result (depending on @command_mode)
@@ -175,3 +177,4 @@ require File.dirname(__FILE__) + '/fresh/prompt'
 #       readme
 #       multi_line
 #       bond
+#       stderr

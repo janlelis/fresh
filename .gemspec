@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.summary     = "Fresh Ruby Enhanced SHell"
   s.description = "Fresh Ruby Enhanced SHell automatically detects, if your current command should be Ruby or a system command."
   s.required_rubygems_version = ">= 1.3.6"
+  s.required_ruby_version = ">= 1.9"
   s.executables = ['ripl-fresh', 'fresh']
   s.add_dependency 'ripl', '>= 0.2.5'
   s.files = Dir.glob(%w[{lib,test}/**/*.rb bin/* [A-Z]*.{txt,rdoc} ext/**/*.{rb,c} **/deps.rip]) + %w{Rakefile .gemspec}
