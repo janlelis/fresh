@@ -24,7 +24,6 @@ module Ripl
     end
 
     module Shell
-      # setup Fresh
       def before_loop
         @command_mode = :ruby
         super
@@ -37,8 +36,11 @@ module Ripl
       def get_input
         input = super
 
-        return input  if @buffer # ripl-multi_line
+        return input  if @buffer # ripl-multi_line TODO allow system commands
 
+        # This case statement decides the command mode,
+        #  and which part of the input should be used for what... # TODO refactor
+        @result_storage = @result_operator = nil
         @command_mode = case input
         # force system with a single ^
         when Ripl::Fresh.option_array_to_regexp( Ripl.config[:fresh_system_prefix] )
@@ -49,14 +51,17 @@ module Ripl
           input = input[$1.size..-1]
           :ruby
         # single words, and main regex to match shell commands
-        when /^([a-z_-]+)$/i, Ripl.config[:fresh_match_regexp]
-          if Ripl.config[:fresh_ruby_words].include?($1)
+        when *Array( Ripl.config[:fresh_match_regexp] )
+          input            = $1
+          @result_operator = $3
+          @result_storage  = $4
+          if Ripl.config[:fresh_ruby_words].include?($2)
             :ruby
-          elsif Ripl.config[:fresh_mixed_words].include?($1)
+          elsif Ripl.config[:fresh_mixed_words].include?($2)
             :mixed
-          elsif Ripl.config[:fresh_system_words].include?($1)
+          elsif Ripl.config[:fresh_system_words].include?($2)
             :system
-          elsif Kernel.respond_to? $1.to_sym
+          elsif Kernel.respond_to? $2.to_sym
             :ruby
           else
             Ripl.config[:fresh_match_default]
@@ -74,19 +79,50 @@ module Ripl
         if input == ''
           @command_mode = :system and return
         end
+        ret = nil
 
         case @command_mode
         when :system # execute command
-          ret = system input
+          
+          if @result_storage
+            temp_file = "/tmp/ripl-fresh_#{ rand 12345678901234567890 }"
+            ret       = system input, :out => temp_file
+            # TODO stderr: either
+            # * merge with stdout
+            # * just display on real stderr
+            # * abort command execution
+            
+            # assign result to result storage variable
+            case @result_operator
+            when '=>', '=>>'
+              result_literal   = "[]"
+              formatted_result = "File.read('#{ temp_file }').split($/)"
+              operator = @result_operator == '=>>' ? '+=' : '='
+            when '~>', '~>>'
+              result_literal = "''"
+              formatted_result = "File.read('#{ temp_file }')"
+              operator = @result_operator == '~>>' ? '<<' : '='
+            end
+
+            Ripl.shell.binding.eval "
+              #{ @result_storage } ||= #{ result_literal }
+              #{ @result_storage } #{ operator } #{ formatted_result }"
+            
+            FileUtils.rm temp_file
+          else
+            ret = system input
+          end
+
           case ret
           when false
             warn '[non-nil exit status]' # too verbose?
           when nil
             warn "[command error #{$?.exitstatus}]" # add message?
           end
+
           ret
 
-        when :mixed # call the ruby method, but with shell style arguments
+        when :mixed # call the ruby method, but with shell style arguments TODO more shell like (e.g. "")
           m, *args = *input.split
           super "#{m}(*#{args.to_s})"
 
@@ -94,7 +130,6 @@ module Ripl
           super
         end
       end
-
 
       # system commands don't have output values and Ruby is displayed normally
       def print_result(result)
@@ -127,27 +162,16 @@ Ripl::Shell.send :include, Ripl::Fresh::Shell
 # load :mixed commands
 require File.dirname(__FILE__) + '/fresh/commands'
 
-## fresh config ###
+# fresh config
+require File.dirname(__FILE__) + '/fresh/config'
 
-# prefixes
-Ripl.config[:fresh_system_prefix]  = %w[^]
-Ripl.config[:fresh_ruby_prefix]    = [' ']
-# word arrays
-Ripl.config[:fresh_ruby_words]     = %w[begin case class def for if module undef unless until while puts warn print p pp ap raise fail loop require load lambda proc system]
-Ripl.config[:fresh_system_words]   =
-  ENV['PATH'].split(File::PATH_SEPARATOR).uniq.map {|e|
-    File.directory?(e) ? Dir.entries(e) : []
-  }.flatten.uniq - ['.', '..'] 
-Ripl.config[:fresh_mixed_words]    = %w[cd] 
-# main regexp
-Ripl.config[:fresh_match_regexp]    = /^([a-z\/_-]+)\s+(?!(?:[=%*]|!=|\+=|-=|\/=))/i
-# regex matched but word not in one of the three arrays, possible values: :ruby, :system, :mixed
-Ripl.config[:fresh_match_default]   = :ruby
-# regex did not match
-Ripl.config[:fresh_default]         = :ruby
-# configure prompt
-Ripl.config[:fresh_prompt] = :default
-
+# fresh_prompt management
 require File.dirname(__FILE__) + '/fresh/prompt'
 
 # J-_-L
+#
+# TODO: test on jruby + rbx
+#       forced commands
+#       readme
+#       multi_line
+#       bond

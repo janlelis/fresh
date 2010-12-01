@@ -26,9 +26,32 @@ Note, that it will also load your <tt>.irbrc</tt> file. To avoid this, you can d
 
 == Usage & configuration options
 
-For an example session, see {this blog entry}[http://rbjl.net/43-use-fresh-ruby-as-your-shell].
+Just start the shell and play around, to get a fresh feeling. For an example session, see {this blog entry}[http://rbjl.net/43-use-fresh-ruby-as-your-shell].
 
-The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^[a-z_-]+\s+.*/i</tt> (match a single word followed by at least one space). It can be adjusted in <tt>Ripl.config[:fresh_match_regexp]</tt>.
+The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^[a-z_-]+\s+.*/i</tt> (match a single word followed by at least one space). It can be adjusted in <tt>Ripl.config[:fresh_match_regexp]</tt>. See below for details.
+
+TODO [0.1.3]
+
+To use the command output, you can redirect it to a Ruby variable (or similar Ruby expression) like this:
+
+  ls => variable
+
+Please note: The "=> variable" part has to be the line ending.
+The output of the <tt>ls</tt> command is now stored as array in <tt>variable</tt> and can be used in the next line. There are three variations of this command: 
+* <tt>=>></tt> append result to the array specified (or create it)
+* <tt>~></tt>  use command as string instead of an array
+* <tt>~>></tt> use command as string instead of an array and append (or create)
+
+
+=== Prompt
+There is <tt>Riplc.config[:fresh_prompt]</tt> option, which takes a wide range of possible values. You can pass in a proc or a direct string. Furthermore, you can pass a symbol to get one of the following:
+* <tt>:default</tt> - usual fresh (directory) prompt
+* <tt>:PS1</tt> - use PS1 environment variable
+* <tt>:ripl</tt> - don't change prompt
+* <tt>:irb</tt> - use irbs :PROMPT_I (if set)
+* <tt>:simple</tt> - ">> "
+
+=== Command mode determination
 
 If this regexp matches or the input is a single word <tt>([a-z_-]+)</tt>, _fresh_ searches through the <tt>Ripl.config[:fresh_ruby_words]</tt> array for exceptions that still should get interpreted as Ruby (e.g. <tt>def </tt>).
 
@@ -43,14 +66,6 @@ If the regexp does match, but the command could not be found in any of the three
 Of course, there is a way to explicitly set your command mode: You can prefix your input with a space to force Ruby mode as well as you can prefix it with <tt>^</tt> to force system mode. The strings used for this can be customized in <tt>Ripl.config[:fresh_system_prefix]</tt> and <tt>Ripl.config[:fresh_ruby_prefix]</tt>.
 
 You need to take a look at <tt>get_input</tt> method in the source file to 100% understand the command mode detection way.
-
-=== Prompt
-There is <tt>Riplc.config[:fresh_prompt]</tt> option, which takes a wide range of possible values. You can pass in a proc or a direct string. Furthermore, you can pass a symbol to get one of the following:
-* <tt>:default</tt> - usual fresh (directory) prompt
-* <tt>:PS1</tt> - use PS1 environment variable
-* <tt>:ripl</tt> - don't change prompt
-* <tt>:irb</tt> - use irbs :PROMPT_I (if set)
-* <tt>:simple</tt> - ">> "
 
 === Defaults
 
@@ -89,7 +104,6 @@ There are lots of things which can get better:
 * More cool (and colorful?) <tt>:mixed</tt> Ruby commands
 * Improve interaction between system and Ruby commands
   * <tt>ripl-multi_line</tt> for system commands
-  * Result of system commands should be available for ruby, not only printed to stdout
 * Respect "..." (single argument) for :mixed commands
 * Improve default configuration
 * Add tests
@@ -101,6 +115,8 @@ Feel free to fork in your improvements ;)
 
 * {rush}[https://github.com/adamwiggins/rush] - Another Ruby shell, different concept
 * {ripl}[https://github.com/cldwalker/ripl] - An irb alternative, +fresh+ is based on it
+* {rubsh}[123] - Some similar ideas
+* {ulch}[123]
 
 == Copyright
 

@@ -1,8 +1,5 @@
-require 'socket'
-require 'etc'
-
 # save current prompt
-ripl_prompt = Ripl.config[:prompt] # TODO currently not working
+ripl_prompt = Ripl.config[:prompt] # FIXME currently not working
 
 # setup default prompt
 default_prompt = proc{ |path|
@@ -12,6 +9,9 @@ default_prompt = proc{ |path|
 
 # PS environment variable prompt
 ps_prompt = proc{ |prompt_number|
+  require 'socket'
+  require 'etc'
+
   prompt = ENV['PS' + prompt_number.to_s].dup
   prompt.gsub!('\a', '')                              # unsupported
   prompt.gsub!('\d', Time.now.strftime("%a %b %d"))
