@@ -4,16 +4,11 @@ require 'fileutils'
 module Ripl
   module Fresh
     module Commands
-=begin
-      def ls(path='.')
-        Dir[ File.join( path, '*' )].map{|res| res =~ /^#{path}\/?/; $' }
-      end
-      alias dir ls
-=end
-
       def cd( path = File.expand_path('~') )
         new_last_path = FileUtils.pwd
-        if path == '-'
+        if path =~ /^\.{3,}$/
+          path = File.join( %w[..] * ($&.size-1) )
+        elsif path == '-'
           if @last_path
             path = @last_path
           else
