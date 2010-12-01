@@ -81,14 +81,14 @@ module Ripl
         if input == ''
           @command_mode = :system and return
         end
-        ret = nil
+        status = nil
 
         case @command_mode
         when :system # execute command
           
           if @result_storage
             temp_file = "/tmp/ripl-fresh_#{ rand 12345678901234567890 }"
-            ret       = system input, :out => temp_file
+            status    = system input, :out => temp_file
             # TODO stderr: either
             # * merge with stdout
             # * just display on real stderr
@@ -112,17 +112,17 @@ module Ripl
             
             FileUtils.rm temp_file
           else
-            ret = system input
+            status = system input
           end
 
-          case ret
+          case status
           when false
             warn '[non-nil exit status]' # too verbose?
           when nil
             warn "[command error #{$?.exitstatus}]" # add message?
           end
 
-          ret
+          status
 
         when :mixed # call the ruby method, but with shell style arguments TODO more shell like (e.g. "")
           m, *args = *input.split
@@ -173,7 +173,6 @@ require File.dirname(__FILE__) + '/fresh/prompt'
 # J-_-L
 #
 # TODO: test on jruby + rbx
-#       forced commands
 #       readme
 #       multi_line
 #       bond

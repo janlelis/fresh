@@ -2,7 +2,7 @@
 ripl_prompt = Ripl.config[:prompt] # FIXME currently not working
 
 # setup default prompt
-default_prompt = proc{ |path|
+default_prompt = proc{ |path = FileUtils.pwd|
   path.gsub! /#{ File.expand_path('~') }/, '~'
   path + '> '
 }
@@ -69,7 +69,7 @@ Ripl.config[:prompt] = proc{
 
   # call if proc or return directly
   if fp.respond_to? :call
-    fp.arity == 1 ? fp[ FileUtils.pwd ] : fp.call
+    fp[ FileUtils.pwd ]
   else
     case fp
     when nil, false
@@ -78,7 +78,7 @@ Ripl.config[:prompt] = proc{
       fp
     else
       Ripl.config[:fresh_prompt] = :default
-      default_proc.call[ FileUtils.pwd ]
+      default_proc.call
     end
   end
 }

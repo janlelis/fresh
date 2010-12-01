@@ -24,6 +24,6 @@ module Ripl
   end
 end
 
-Ripl::Commands.send :include, Ripl::Fresh::Commands if defined? Ripl::Commands
+Ripl::Commands.send :include, Ripl::Fresh::Commands
 
 # J-_-L
