@@ -13,7 +13,8 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.required_ruby_version = ">= 1.9"
   s.executables = ['ripl-fresh', 'fresh']
-  s.add_dependency 'ripl', '>= 0.2.5'
+  s.add_dependency 'ripl', '>= 0.2.6'
+  s.add_dependency 'ripl-multi_line', '>= 0.2.0'
   s.files = Dir.glob(%w[{lib,test}/**/*.rb bin/* [A-Z]*.{txt,rdoc} ext/**/*.{rb,c} **/deps.rip]) + %w{Rakefile .gemspec}
   s.extra_rdoc_files = ["README.rdoc", "LICENSE"]
   s.license = 'MIT'
