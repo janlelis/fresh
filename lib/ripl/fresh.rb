@@ -152,8 +152,6 @@ require File.dirname(__FILE__) + '/fresh/prompt'
 #
 # TODO: test on jruby + rbx
 #       readme
-#       multi_line
 #       bond
 #       stderr
 #       different ~> prompt?
-#       rake dummy generator

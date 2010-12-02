@@ -26,3 +26,10 @@ desc "Validate the gemspec"
 task :gemspec do
   gemspec.validate
 end
+
+desc 'build dummy "fresh" gem'
+task :dummy_gem do
+  sh "gem build fresh.gemspec"
+  FileUtils.mkdir_p 'pkg'
+  FileUtils.mv "fresh-#{gemspec.version}.gem", 'pkg'
+end
