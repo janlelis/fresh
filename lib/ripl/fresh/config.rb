@@ -32,7 +32,9 @@ _anything_but_these = '(?!(?:[=%*]|!=|\+=|-=|\/=)).*?'
 
 Ripl.config[:fresh_patterns] = [
   /^#{ force }(?<command_line>.*?)#{ _store }$/,                             # force system
+  nil, nil, nil, nil,
   /^(?<command_line>#{ command })\s*#{ _store }$/,                           # single word
+  nil, nil, nil, nil,
   /^(?<command_line>#{ command }\s+#{ _anything_but_these })#{ _store }$/,   # command + space
 ]
 

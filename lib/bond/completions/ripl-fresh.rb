@@ -1,5 +1,5 @@
 # no advanced auto completion, yet
-# todo: not only default options
+# TODO meaningful, fine-tuned, good autocompletion
 
 require 'readline'
 
@@ -18,16 +18,15 @@ everything_completion = proc{ # TODO: improve
 }
 
 
-complete :on => Ripl.config[:fresh_match_regexp],
-         :search => false,
-          &file_completion
+complete on: Regexp.union( *Ripl.config[:fresh_patterns].compact ),
+         search: false,
+         &file_completion
 
 # TODO fires only when space after ^
-complete :on => Ripl::Fresh.option_array_to_regexp( Ripl.config[:fresh_system_prefix] ),
-#         :search => false,
-          &system_command_completion
+complete on: Ripl.config[:fresh_patterns][0],
+         &system_command_completion
 
-complete :on => /^[a-z\/_-]*/i,
-          &everything_completion
+complete on: /^[a-z\/_-]*/i,
+         &everything_completion
 
 # J-_-L

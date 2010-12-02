@@ -28,7 +28,7 @@ module Ripl
       when /^ /
         :ruby
       # regexp match shell commands
-      when *Array( Ripl.config[:fresh_patterns] )
+      when *Array( Ripl.config[:fresh_patterns] ).compact
         command_line     = $~[:command_line]     if $~.names.include? 'command_line'
         command          = $~[:command]          if $~.names.include? 'command'
         @result_operator = $~[:result_operator]  if $~.names.include? 'result_operator'
@@ -152,6 +152,5 @@ require File.dirname(__FILE__) + '/fresh/prompt'
 #
 # TODO: test on jruby + rbx
 #       readme
-#       bond
 #       stderr
 #       different ~> prompt?
