@@ -28,17 +28,17 @@ Note, that it will also load your <tt>.irbrc</tt> file. To avoid this, you can d
 
 Just start the shell and play around, to get a fresh feeling. For an example session, see {this blog entry}[http://rbjl.net/43-use-fresh-ruby-as-your-shell].
 
-The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^[a-z_-]+\s+.*/i</tt> (match a single word followed by at least one space). It can be adjusted in <tt>Ripl.config[:fresh_match_regexp]</tt>. See below for details.
+The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^\\w+\\s+.*/</tt> (match a single word followed by at least one space). See below for details.
 
-To use the system command output, you can redirect it to a Ruby variable (or similar Ruby expression) like this:
+You can use the output of system commands and redirect it to a Ruby variable (or similar Ruby expression) like this:
 
   ls => variable
 
-Please note: The "=> variable" part has to be the line ending.
+Please note: The "=> variable" part has to be at the line ending.
 The output of the <tt>ls</tt> command is now stored as array in <tt>variable</tt> and can be used in the next line. There are three variations of this command: 
 * <tt>=>></tt> append result to the array specified (or create it)
 * <tt>~></tt>  use command as string instead of an array
-* <tt>~>></tt> use command as string instead of an array and append (or create)
+* <tt>~>></tt> use command as string instead of an array and append (or create it)
 
 
 === Prompt
@@ -51,7 +51,7 @@ There is <tt>Riplc.config[:fresh_prompt]</tt> option, which takes a wide range o
 
 === Command mode determination
 
-There are three different command modes: <tt>:ruby</tt>, <tt>system</tt> and <tt>mixed</tt>.
+There are three different command modes: <tt>:ruby</tt>, <tt>:system</tt> and <tt>:mixed</tt>.
 
 <tt>:ruby</tt> is usual Ruby, <tt>:system</tt> means system command and <tt>:mixed</tt> looks like system command, but is just redirected to the Ruby method with that name.
 
@@ -59,11 +59,11 @@ The input is matched against the regexps in <tt>Ripl.config[:fresh_patterns]</tt
 
 When a regexp has matched, the command is searched for in <tt>Ripl.config[:fresh_ruby_commands]</tt>, <tt>Ripl.config[:fresh_system_commands]</tt> and <tt>Ripl.config[:fresh_mixed_commands]</tt> (in this order).
 
-The ruby command array contains some common Ruby words, e.g. <tt>def </tt>. The system command array is set to your <tt>ENV['PATH']</tt>. The mixed array currently contains only +cd+. You can adjust this options for your needs.
+The ruby command array contains some common Ruby words, e.g. <tt>def </tt>. The system command array is set to your <tt>ENV['PATH']</tt>. The mixed array currently contains only +cd+. You can adjust the arrays as you want to.
 
 As a fallback, _fresh_ checks <tt>Kernel.respond_to?</tt>, if there is a ruby method with that name.
 
-If the regexp did match, but the command could not be found in any of the three word arrays and <tt>respond_to?<tt> has not been successful, the command mode will be set to <tt>Ripl.config[:fresh_unknown_command_mode]</tt> (<tt>:ruby</tt>). If the regexp did not match, <tt>Ripl.config[:fresh_default_mope]</tt> is used (<tt>:ruby</tt>).
+If the regexp did match, but the command could not be found in any of the three word arrays and <tt>respond_to?</tt> has not been successful, the command mode will be set to <tt>Ripl.config[:fresh_unknown_command_mode]</tt> (default <tt>:ruby</tt>). If the regexp did not match, <tt>Ripl.config[:fresh_default_mope]</tt> is used (default <tt>:ruby</tt>).
 
 You need to take a look at <tt>get_input</tt> method in the source file to 100% understand the command mode detection way.
 
@@ -94,6 +94,7 @@ There are lots of things which can get better:
 * More cool (and colorful?) <tt>:mixed</tt> Ruby commands
   * Respect "..." (single argument) for :mixed commands
 * Add tests
+* Be compatible (and installable) with JRuby/Rubinius
 * Fresh ideas
 
 Feel free to fork in your improvements ;)
@@ -104,7 +105,7 @@ Feel free to fork in your improvements ;)
 * {ripl}[https://github.com/cldwalker/ripl]    - An irb alternative, _fresh_ is based on it
 * {rubsh}[https://github.com/danielb2/rubsh]   - Some similar ideas
 * {urchin}[https://github.com/Spakman/urchin]  - More unix like approach
-* {rubish}https://github.com/hayeah/rubish     - And another approach
+* {rubish}[https://github.com/hayeah/rubish]   - And another approach
 
 == Copyright
 

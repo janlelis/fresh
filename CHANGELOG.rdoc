@@ -1,2 +1,21 @@
+== 0.2.0
+* Better system command error handling
+* Refactored command mode detection, changed configuration settings
+* Now you can redirect system results to ruby vars using => variable
+* Compatible with ripl-0.2.6 and ripl-multi_line-0.2.0
+* No more Ruby 1.8 support!
+* More little changes and doc updates
+
+== 0.1.2
+* Command mode detection changes
+* Added flexible fresh_prompt configuration
+  * set config[:fresh_prompt] to :PS1 to get your shell prompt, thanks to fallwith
+* Improved auto-completion
+
+== 0.1.1
+* Fixed cd command
+* Changed command_mode detection (using PATH)
+* Better autocompletion
+
 == 0.1.0
 * Initial release

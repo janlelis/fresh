@@ -3,7 +3,7 @@ require 'fileutils'
 
 module Ripl
   module Fresh
-    VERSION = '0.2.0.pre'
+    VERSION = '0.2.0'
 
     def before_loop
       @command_mode = :ruby
@@ -132,6 +132,3 @@ require File.dirname(__FILE__) + '/fresh/config'
 require File.dirname(__FILE__) + '/fresh/prompt'
 
 # J-_-L
-#
-# TODO: test on jruby + rbx
-#       different ~> prompt?
