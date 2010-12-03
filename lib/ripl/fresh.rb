@@ -67,11 +67,7 @@ module Ripl
           ruby_command_code = "_ = system '#{ input }'\n"
         else
           temp_file = "/tmp/ripl-fresh_#{ rand 12345678901234567890 }"
-          ruby_command_code = "_ = system '#{ input }', :out => '#{ temp_file }'\n"
-          # TODO stderr: either
-          # * merge with stdout
-          # * just display on real stderr
-          # * abort command execution
+          ruby_command_code = "_ = system '#{ input } 2>&1', :out => '#{ temp_file }'\n"
           
           # assign result to result storage variable
           case @result_operator
@@ -91,15 +87,11 @@ module Ripl
           %
         end
 
-        ruby_command_code << %q%
-          case _
-          when false
-            warn '[non-nil exit status]' # too verbose?
-          when nil
-            warn "[command error #{$?.exitstatus}]" # add message?
-          end
-          _
-        %
+        # ruby_command_code << "raise( SystemCallError.new $?.exitstatus ) if !_\n" # easy auto indent
+        ruby_command_code << "if !_
+                                raise( SystemCallError.new $?.exitstatus )
+                              end;"
+        
         super @input = ruby_command_code
 
       when :mixed # call the ruby method, but with shell style arguments TODO more shell like (e.g. "")
@@ -120,15 +112,6 @@ module Ripl
       else
         super # puts(format_result(result))
       end
-    end
-
-    # catch ctrl+c
-    def loop_once(*args)
-      super
-    rescue Interrupt
-      @buffer = @error_raised = nil
-      puts '[C]'
-      retry
     end
   end
 end
@@ -151,6 +134,4 @@ require File.dirname(__FILE__) + '/fresh/prompt'
 # J-_-L
 #
 # TODO: test on jruby + rbx
-#       readme
-#       stderr
 #       different ~> prompt?
