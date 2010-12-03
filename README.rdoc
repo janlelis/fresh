@@ -30,9 +30,7 @@ Just start the shell and play around, to get a fresh feeling. For an example ses
 
 The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^[a-z_-]+\s+.*/i</tt> (match a single word followed by at least one space). It can be adjusted in <tt>Ripl.config[:fresh_match_regexp]</tt>. See below for details.
 
-TODO [0.2.0]
-
-To use the command output, you can redirect it to a Ruby variable (or similar Ruby expression) like this:
+To use the system command output, you can redirect it to a Ruby variable (or similar Ruby expression) like this:
 
   ls => variable
 
@@ -53,25 +51,32 @@ There is <tt>Riplc.config[:fresh_prompt]</tt> option, which takes a wide range o
 
 === Command mode determination
 
-=begin rewrite for 0.2.0
-If this regexp matches or the input is a single word <tt>([a-z_-]+)</tt>, _fresh_ searches through the <tt>Ripl.config[:fresh_ruby_words]</tt> array for exceptions that still should get interpreted as Ruby (e.g. <tt>def </tt>).
+There are three different command modes: <tt>:ruby</tt>, <tt>system</tt> and <tt>mixed</tt>.
 
-Then, the <tt>Ripl.config[:fresh_system_words]</tt> arrays is checked, if it contains the command. This array defaults to your <tt>ENV['PATH']</tt>. You can add your own system commands there.
+<tt>:ruby</tt> is usual Ruby, <tt>:system</tt> means system command and <tt>:mixed</tt> looks like system command, but is just redirected to the Ruby method with that name.
 
-There is also a third kind of command mode (besides <tt>:ruby</tt> and <tt>:system</tt>): <tt>:mixed</tt>. They look and feel like system commands, but redirect to the Ruby method described by the first word. You can register them in <tt> Ripl.config[:fresh_mixed_words]</tt> (e.g. +cd+).
+The input is matched against the regexps in <tt>Ripl.config[:fresh_patterns]</tt>. These regexps also contain named groups, to determine the command or if the command should be stored in a variable.
+
+When a regexp has matched, the command is searched for in <tt>Ripl.config[:fresh_ruby_commands]</tt>, <tt>Ripl.config[:fresh_system_commands]</tt> and <tt>Ripl.config[:fresh_mixed_commands]</tt> (in this order).
+
+The ruby command array contains some common Ruby words, e.g. <tt>def </tt>. The system command array is set to your <tt>ENV['PATH']</tt>. The mixed array currently contains only +cd+. You can adjust this options for your needs.
 
 As a fallback, _fresh_ checks <tt>Kernel.respond_to?</tt>, if there is a ruby method with that name.
 
-If the regexp does match, but the command could not be found in any of the three word arrays, the command mode will be set to <tt>Ripl.config[:fresh_match_default]</tt> (<tt>:ruby</tt>). If the regexp does not match, <tt>Ripl.config[:fresh_default]</tt> is used (also defaults to <tt>:ruby</tt>).
-
-Of course, there is a way to explicitly set your command mode: You can prefix your input with a space to force Ruby mode as well as you can prefix it with <tt>^</tt> to force system mode. The strings used for this can be customized in <tt>Ripl.config[:fresh_system_prefix]</tt> and <tt>Ripl.config[:fresh_ruby_prefix]</tt>.
+If the regexp did match, but the command could not be found in any of the three word arrays and <tt>respond_to?<tt> has not been successful, the command mode will be set to <tt>Ripl.config[:fresh_unknown_command_mode]</tt> (<tt>:ruby</tt>). If the regexp did not match, <tt>Ripl.config[:fresh_default_mope]</tt> is used (<tt>:ruby</tt>).
 
 You need to take a look at <tt>get_input</tt> method in the source file to 100% understand the command mode detection way.
-=end
+
+=== Patterns
+
+The <tt>Ripl.config[:fresh_patterns]</tt> contains three Regexps, which do the following:
+* match <tt>^</tt> to force system mode
+* match a single word
+* match a word followed by a space
 
 === Defaults
 
-TODO: add
+See <tt>lib/ripl/fresh/config.rb</tt> for all configuration options and its defaults.
 
 == Customization
 
@@ -87,10 +92,7 @@ There are lots of things which can get better:
 
 * Improve auto-completion
 * More cool (and colorful?) <tt>:mixed</tt> Ruby commands
-* Improve interaction between system and Ruby commands
-  * <tt>ripl-multi_line</tt> for system commands
-* Respect "..." (single argument) for :mixed commands
-* Improve default configuration
+  * Respect "..." (single argument) for :mixed commands
 * Add tests
 * Fresh ideas
 
@@ -98,10 +100,11 @@ Feel free to fork in your improvements ;)
 
 == Other gems you might find interesting
 
-* {rush}[https://github.com/adamwiggins/rush] - Another Ruby shell, different concept
-* {ripl}[https://github.com/cldwalker/ripl] - An irb alternative, +fresh+ is based on it
-* {rubsh}[http://rubygems.org/gems/rubsh] - Some similar ideas
-* {urchin}[https://github.com/Spakman/urchin] - More unix like approach
+* {rush}[https://github.com/adamwiggins/rush]  - Another Ruby shell, different concept
+* {ripl}[https://github.com/cldwalker/ripl]    - An irb alternative, _fresh_ is based on it
+* {rubsh}[https://github.com/danielb2/rubsh]   - Some similar ideas
+* {urchin}[https://github.com/Spakman/urchin]  - More unix like approach
+* {rubish}https://github.com/hayeah/rubish     - And another approach
 
 == Copyright
 

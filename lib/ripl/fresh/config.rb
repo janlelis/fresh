@@ -31,11 +31,11 @@ _store          = "(?:#{ result_operator }\s*#{ result_storage })?"  # matches f
 _anything_but_these = '(?!(?:[=%*]|!=|\+=|-=|\/=)).*?'
 
 Ripl.config[:fresh_patterns] = [
-  /^#{ force }(?<command_line>.*?)#{ _store }$/,                             # force system
+  /^#{ force }(?<command_line>.*?)#{ _store }$/,                             # [0] force system
   nil, nil, nil, nil,
-  /^(?<command_line>#{ command })\s*#{ _store }$/,                           # single word
+  /^(?<command_line>#{ command })\s*#{ _store }$/,                           # [5] single word
   nil, nil, nil, nil,
-  /^(?<command_line>#{ command }\s+#{ _anything_but_these })#{ _store }$/,   # command + space
+  /^(?<command_line>#{ command }\s+#{ _anything_but_these })#{ _store }$/,   # [10] command + space
 ]
 
 # J-_-L
