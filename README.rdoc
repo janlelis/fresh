@@ -90,7 +90,9 @@ Currently, most {plugins}[http://github.com/cldwalker/ripl-color_error] {enable}
 
 There are lots of things which can get better:
 
+* Refactor a little bit
 * Improve auto-completion
+* RVM support possible?
 * More cool (and colorful?) <tt>:mixed</tt> Ruby commands
   * Respect "..." (single argument) for :mixed commands
 * Add tests

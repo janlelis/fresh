@@ -1,9 +1,10 @@
 require 'ripl'
+require 'ripl/multi_line'
 require 'fileutils'
 
 module Ripl
   module Fresh
-    VERSION = '0.2.0'
+    VERSION = '0.2.1'
 
     def before_loop
       @command_mode = :ruby
@@ -116,11 +117,12 @@ module Ripl
   end
 end
 
-# load plugins and hook in (and work around readline loading behaviour)
+# load plugins and hook in (and work around readline loading behaviour) TODO: refactor
+readline = Ripl.config[:readline] == true ? 'readline' : Ripl.config[:readline]
 Ripl.config[:readline] = false
+require readline
 require 'ripl/readline'
-require 'ripl/multi_line'
-Ripl::Shell.send :include, Ripl::Fresh
+Ripl::Shell.include Ripl::Fresh
 
 # load :mixed commands
 require File.dirname(__FILE__) + '/fresh/commands'
@@ -130,5 +132,8 @@ require File.dirname(__FILE__) + '/fresh/config'
 
 # fresh_prompt management
 require File.dirname(__FILE__) + '/fresh/prompt'
+
+# configure other plugins
+Ripl.config[:rocket_mode] = false
 
 # J-_-L

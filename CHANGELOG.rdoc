@@ -1,3 +1,7 @@
+== 0.2.1
+* Be compatible with latest ripls
+* Deactivate rocket prompt
+
 == 0.2.0
 * Better system command error handling
 * Refactored command mode detection, changed configuration settings
