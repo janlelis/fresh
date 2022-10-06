@@ -26,7 +26,7 @@ Note, that it will also load your <tt>.irbrc</tt> file. To avoid this, you can d
 
 == Usage & configuration options
 
-Just start the shell and play around, to get a fresh feeling. For an example session, see {this blog entry}[http://rbjl.net/43-use-fresh-ruby-as-your-shell].
+Just start the shell and play around, to get a fresh feeling. For an example session, see {this blog entry}[https://rbjl.janlelis.com/43-use-fresh-ruby-as-your-shell].
 
 The main regexp to determine if the command should be interpreted as system command is similar to this one: <tt>/^\\w+\\s+.*/</tt> (match a single word followed by at least one space). See below for details.
 
