@@ -111,6 +111,6 @@ Feel free to fork in your improvements ;)
 
 == Copyright
 
-Copyright (c) 2010 Jan Lelis <http://code-needs-smileys.com> released under the MIT license.
+Copyright (c) 2010 Jan Lelis, released under the MIT license.
 
 J-_-L
